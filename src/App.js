@@ -35,7 +35,7 @@ function App() {
         {isLoading && 
         <p>Loading .... </p>
         }        
-        {!isLoading &&
+        {!isLoading && movies.length > 0 &&
         <MoviesList movies={movies} />
         }
       </section>
