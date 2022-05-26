@@ -49,7 +49,7 @@ function App() {
         {!isLoading && movies.length > 0 &&
         <MoviesList movies={movies} />
         }
-        {!isLoading && movies.length === 0 && 
+        {!isLoading && movies.length === 0 && !error &&
         <p>Found No Movies</p>}
         {!isLoading && error && <p>{error}</p>}
       </section>
