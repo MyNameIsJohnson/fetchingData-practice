@@ -7,25 +7,36 @@ function App() {
 
   const [movies, setMovies] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
   // async await way of fetching data 
+  
+  
   const fetchFilms = async () => {
-    setIsLoading(true)
-    const endpoint = `https://swapi.dev/api/films/`;
-    const data = await (await fetch(endpoint)).json()
-   
-    // You can transform your data from the API to match your props 
-    const transformData = data.results.map(movieData => {
-      return {
-        id: movieData.episode_id,
-        title: movieData.title,
-        releaseDate: movieData.release_date,
-        openingText: movieData.opening_crawl
-      }
-    }) 
-    setMovies(transformData)
-    setIsLoading(false)
-  };
+    setIsLoading(true);
+    setError(null);
 
+    try {
+      const endpoint = await fetch(`https://swapi.dev/api/film/`);
+      if(!endpoint.ok){
+        throw new Error('Something went wrong')
+      }
+      const data = await endpoint.json();
+  
+      // You can transform your data from the API to match your props 
+      const transformData = data.results.map(movieData => {
+        return {
+          id: movieData.episode_id,
+          title: movieData.title,
+          releaseDate: movieData.release_date,
+          openingText: movieData.opening_crawl
+        }
+      }); 
+      setMovies(transformData)
+    } catch (error){
+      setError(error.message)
+    }
+    setIsLoading(false)
+  }
   return (
     <React.Fragment>
       <section>
@@ -38,6 +49,9 @@ function App() {
         {!isLoading && movies.length > 0 &&
         <MoviesList movies={movies} />
         }
+        {!isLoading && movies.length === 0 && 
+        <p>Found No Movies</p>}
+        {!isLoading && error && <p>{error}</p>}
       </section>
     </React.Fragment>
   );
