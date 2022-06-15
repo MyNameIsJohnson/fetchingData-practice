@@ -5,6 +5,7 @@ import AddMovie from "./components/AddMovie";
 
 function App() {
   const [movies, setMovies] = useState([]);
+  const [addmovies, setAddMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -16,23 +17,30 @@ function App() {
     try {
       // Stars Wars API
       const response = await fetch("https://swapi.dev/api/films/");
-      // const response = await fetch('https://strwrs-project-7e574-default-rtdb.firebaseio.com/movies.json');
+      const addMovieResponse = await fetch(
+        "https://starwars-api-360c9-default-rtdb.firebaseio.com/movies.json"
+      );
+      // const response = await fetch('https://starwars-api-360c9-default-rtdb.firebaseio.com/movies.json');
       if (!response.ok) {
+        throw new Error("Something went wrong");
+      }
+      if (!addMovieResponse.ok) {
         throw new Error("Something went wrong");
       }
 
       const data = await response.json();
+      const addData = await addMovieResponse.json();
 
       const loadedMovies = [];
 
-      // for (const key in data) {
-      //   loadedMovies.push({
-      //     id: key,
-      //     title: data[key].title,
-      //     openingText: data[key].openingText,
-      //     releaseDate: data[key].releaseDate,
-      //   });
-      // }
+      for (const key in addData) {
+        loadedMovies.push({
+          id: key,
+          title: addData[key].title,
+          openingText: addData[key].openingText,
+          releaseDate: addData[key].releaseDate,
+        });
+      }
 
       // You can transform your data from the API to match your props
       // This is for Stars Wars API
@@ -46,7 +54,7 @@ function App() {
       });
 
       setMovies(transformData);
-      // setMovies(loadedMovies);
+      setAddMovies(loadedMovies);
     } catch (error) {
       setError(error.message);
     }
@@ -59,7 +67,7 @@ function App() {
 
   const addMovie = async (movie) => {
     const response = await fetch(
-      "https://strwrs-project-7e574-default-rtdb.firebaseio.com/movies.json",
+      "https://starwars-api-360c9-default-rtdb.firebaseio.com//movies.json",
       {
         method: "POST",
         body: JSON.stringify(movie),
@@ -73,9 +81,14 @@ function App() {
   };
 
   let content = <p>Found No Movies.</p>;
+  let addedcontent = <p>Found No Movies.</p>;
 
   if (movies.length > 0) {
     content = <MoviesList movies={movies} />;
+  }
+
+  if (addmovies.length > 0) {
+    addedcontent = <MoviesList addmovies={addmovies} />;
   }
 
   if (isLoading) {
@@ -94,7 +107,10 @@ function App() {
       <section>
         <button onClick={fetchFilms}>Fetch Movies</button>
       </section>
-      <section>{content}</section>
+      <section>
+        {content}
+        {addedcontent}
+      </section>
     </React.Fragment>
   );
 }
